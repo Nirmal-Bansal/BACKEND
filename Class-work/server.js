@@ -6,9 +6,35 @@ const server = http.createServer((req,res) => {
     console.log(method,url);
 
 if(method=="GET" && url=="/"){
-    res.end("hello");
+    res.writeHead(200, { "content-type": "text/html"});
+    res.end("<h1>Welcome to the home page</h1>");
+}
+
+else if (method == "GET" && url == "/users") {
+    const users = {users: ["Alice", "Bob", "Charlie"] };
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(JSON.stringify(users));
+}
+else if (method == "POST" && url == "/users") {
+    let body = "";
+    req.on("data", (chunk) => {
+        body += chunk;
+    });
+    req.on("end", () => {
+        const parsedBody = JSON.parse(body);
+
+        res.writeHead(201, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+            message: "User created successfully",
+            data: parsedBody,
+        }));
+    });
+}
+else {
+    res.writeHead(404, { "content-type": "text/plain" });
+    res.end("Route not found");
 }
 });
-server.listen(5000,() => {
-    console.log("server listenig");
+server.listen(3000,() => {
+    console.log("server is runnning on http://localhost:3000");
 });
